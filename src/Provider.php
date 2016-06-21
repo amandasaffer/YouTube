@@ -47,7 +47,7 @@ class Provider extends AbstractProvider implements ProviderInterface
     protected function getUserByToken($token)
     {
         $response = $this->getHttpClient()->get(
-            'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true', [
+            'https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&mine=true', [
             'headers' => [
                 'Authorization' => 'Bearer '.$token,
             ],
@@ -62,8 +62,13 @@ class Provider extends AbstractProvider implements ProviderInterface
     protected function mapUserToObject(array $user)
     {
         return (new User())->setRaw($user)->map([
-            'id' => $user['id'], 'nickname' => $user['snippet']['title'],
-            'name' => null, 'email' => null,
+            'id' => $user['id'],
+            'name' => $user['snippet']['title'],
+            'subscribers' => $user['statistics']['subscriberCount'],
+            'views' => $user['statistics']['viewCount'],
+            'videos' => $user['statistics']['videoCount'],
+            'comments' => $user['statistics']['commentCount'],
+            'email' => null,
             'avatar' => $user['snippet']['thumbnails']['high']['url'],
         ]);
     }
